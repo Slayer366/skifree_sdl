@@ -4,7 +4,7 @@ Skifree SDL
 A source port of the classic [Microsoft Entertainment Pack](https://en.wikipedia.org/wiki/Microsoft_Entertainment_Pack) game "skifree" to cross platform SDL2.
 
 Forked from https://github.com/brooksytech/skifree_sdl -> https://github.com/jeff-1amstudios/skifree_sdl
-Originally forked from the decompiled skifree [skifree_decomp](https://github.com/yuv422/skifree_decomp) by Eric Fry
+originally forked from the decompiled skifree [skifree_decomp](https://github.com/yuv422/skifree_decomp) by Eric Fry
 
 ![Untitled](https://github.com/jeff-1amstudios/skifree_sdl/assets/1063652/95b53385-4d16-4de5-8f9d-10a877fee6a9)
 
@@ -35,7 +35,7 @@ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 This is a cmake project.
 
 ```sh
-git clone https://github.com/jeff-1amstudios/skifree_sdl
+git clone https://github.com/Slayer366/skifree_sdl
 cd skifree_sdl
 # grab resources
 curl -Lo /tmp/ski32_resources.zip https://archive.org/download/ski32_resources/ski32_resources.zip
@@ -47,10 +47,15 @@ cmake ..
 
 or
 
-cd skifree_sdl
 chmod +x ./build.sh
 ./build.sh
 ```
+
+Added command line parameter to launch in fullscreen mode native to display res:
+```
+./skifree_sdl -f
+```
+
 
 ## MacOS
 On MacOS we build an app bundle `skifree_sdl.app`. Use right-click > Open the first time to get around [unverified developer warnings](https://support.apple.com/en-nz/guide/mac-help/mh40616/mac).
