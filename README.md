@@ -34,6 +34,8 @@ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 
 This is a cmake project.
 
+IMPORTANT: Make sure to have the SkiFree resources extracted and copied into the 'skifree_sdl/resources' folder before compiling!
+
 ```sh
 git clone https://github.com/Slayer366/skifree_sdl
 cd skifree_sdl
