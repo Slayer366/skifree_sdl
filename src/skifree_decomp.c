@@ -438,14 +438,14 @@ int initWindows() {
     // short windowWidth;
     //  uint32_t uVar2;
     //  BOOL BVar3;
-//    int nHeight;
+    int nHeight;
     char* lpWindowName;
-//    int nWidth;
+    int nWidth;
 
     int flags;
 
-    SCREEN_WIDTH = 640;
-    SCREEN_HEIGHT = 480;
+    SCREEN_WIDTH = 1280;
+    SCREEN_HEIGHT = 1024;
 
     isPaused = 0;
     // isMinimised = 1;
@@ -480,20 +480,20 @@ int initWindows() {
 //        loadSound(8, &sound_8);
 //    }
 
-//    windowWidth = SCREEN_WIDTH;
-//    if (SCREEN_HEIGHT <= SCREEN_WIDTH) {
-//        windowWidth = SCREEN_HEIGHT;
-//    }
+    windowWidth = SCREEN_WIDTH;
+    if (SCREEN_HEIGHT <= SCREEN_WIDTH) {
+        windowWidth = SCREEN_HEIGHT;
+    }
 
-//    nWidth = windowWidth;
-//    nHeight = SCREEN_HEIGHT;
+    nWidth = windowWidth;
+    nHeight = SCREEN_HEIGHT;
 
     lpWindowName = getCachedString(IDS_TITLE);
 
     // original code was asking for overall window size, here we have to convert it
     // to client size to get the correct original ratio
-//    nWidth = 1008;
-//    nHeight = nWidth * 0.97718253968254f;
+    nWidth = 1008;
+    nHeight = nWidth * 0.97718253968254f;
 
 //    hSkiMainWnd = SDL_CreateWindow(lpWindowName,
 //        SDL_WINDOWPOS_CENTERED,
@@ -508,21 +508,27 @@ int initWindows() {
         flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
 
+//    hSkiMainWnd = SDL_CreateWindow(lpWindowName,
+//        SDL_WINDOWPOS_CENTERED,
+//        SDL_WINDOWPOS_CENTERED,
+//        SCREEN_WIDTH, SCREEN_HEIGHT,
+//        flags);
+
     hSkiMainWnd = SDL_CreateWindow(lpWindowName,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        SCREEN_WIDTH, SCREEN_HEIGHT,
+        nWidth, nHeight,
         flags);
 
     renderer = SDL_CreateRenderer(hSkiMainWnd, -1, SDL_RENDERER_SOFTWARE);
 
     SDL_RendererInfo info;
     SDL_GetRendererInfo(renderer, &info);
-    printf("Renderer name: %s\n", info.name);
-    printf("Texture formats:\n");
-    for (int i = 0; i < info.num_texture_formats; i++) {
-        printf("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
-    }
+//    printf("Renderer name: %s\n", info.name);
+//    printf("Texture formats:\n");
+//    for (int i = 0; i < info.num_texture_formats; i++) {
+//        printf("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
+//   }
 
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xFF);
 
@@ -918,11 +924,11 @@ void paintStatusWindow(HWND hWnd) {
 
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
 
-    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
+//    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
 
-//    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 0, 0, 0));
-//    SDL_Rect r = { 1, 1, statusWindowSurface->w - 2, statusWindowSurface->h - 2 };
-//    SDL_FillRect(statusWindowSurface, &r, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
+    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 0, 0, 0));
+    SDL_Rect r = { 1, 1, statusWindowSurface->w - 2, statusWindowSurface->h - 2 };
+    SDL_FillRect(statusWindowSurface, &r, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
 
     str = getCachedString(IDS_TIME);
     len = strlen(str);
@@ -973,8 +979,8 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     }
 
     // GetTextMetricsA(statusWindowDC, &textMetric);
-//    TTF_SizeUTF8(statusWindowFont, "Ay", &w, &h);
-    TTF_SizeUTF8(statusWindowFont, "A", &w, &h);
+    TTF_SizeUTF8(statusWindowFont, "Ay", &w, &h);
+//    TTF_SizeUTF8(statusWindowFont, "A", &w, &h);
     textLineHeight = h;
     str = getCachedString(IDS_TIME);
     len = strlen(str);
@@ -1006,8 +1012,8 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     statusWindowLabelWidth = maxKeyLength;
 
     // added in sdl port
-//    statusWindowTotalTextWidth += 5;
-//    statusWindowHeight += 5;
+    statusWindowTotalTextWidth += 5;
+    statusWindowHeight += 5;
 
     return 1;
 }
@@ -1241,11 +1247,11 @@ HBITMAP loadBitmapResource(uint32_t resourceId) {
     // return LoadBitmapA(skiFreeHInstance, MAKEINTRESOURCE(resourceId));
 
     sprintf(filename, "resources/ski32_%d.bmp", resourceId);
-    SDL_Surface* bitmap = IMG_Load(filename);
+    // SDL_Surface* bitmap = IMG_Load(filename);
 
-//    embedded_resource_t* res = get_embedded_resource_by_name(filename);
-//    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
-//    SDL_Surface* bitmap = IMG_Load_RW(src, 1);
+    embedded_resource_t* res = get_embedded_resource_by_name(filename);
+    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
+    SDL_Surface* bitmap = IMG_Load_RW(src, 1);
     return bitmap;
 }
 
@@ -3072,13 +3078,16 @@ void formatAndPrintStatusStrings(HDC windowDC) {
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
     SDL_Rect rect;
     rect.x = x;
-//    rect.y = 1;
-//    rect.w = statusWindowSurface->w - x - 1;
-//    rect.h = statusWindowSurface->h - 2;
-    rect.y = 0;
-    rect.w = statusWindowSurface->w - x;
-    rect.h = statusWindowSurface->h;
-    SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
+    rect.y = 1;
+    rect.w = statusWindowSurface->w - x - 1;
+    rect.h = statusWindowSurface->h - 2;
+
+//    rect.y = 0;
+//    rect.w = statusWindowSurface->w - x;
+//    rect.h = statusWindowSurface->h;
+
+//    SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
+    SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
 
     len = formatElapsedTime(elapsedTime, strBuf);
     drawText(windowDC, strBuf, x, &y, len);
@@ -3761,8 +3770,8 @@ BOOL createBitmapSheets(HDC param_1) {
         //  DeleteObject(pvVar2);
     }
 
-    SDL_SetColorKey(largeBitmapDC, SDL_TRUE, SDL_MapRGBA(largeBitmapDC->format, 0xFF, 0xFF, 0xFF, 0));
-    SDL_SetColorKey(smallBitmapDC, SDL_TRUE, SDL_MapRGBA(smallBitmapDC->format, 0xFF, 0xFF, 0xFF, 0));
+    SDL_SetColorKey(largeBitmapDC, SDL_TRUE, SDL_MapRGB(largeBitmapDC->format, 0xFF, 0xFF, 0xFF));
+    SDL_SetColorKey(smallBitmapDC, SDL_TRUE, SDL_MapRGB(smallBitmapDC->format, 0xFF, 0xFF, 0xFF));
 
     largeTextureAtlas = SDL_CreateTextureFromSurface(renderer, largeBitmapDC);
     smallTextureAtlas = SDL_CreateTextureFromSurface(renderer, smallBitmapDC);
