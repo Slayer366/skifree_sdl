@@ -63,5 +63,4 @@ On MacOS we build an app bundle `skifree_sdl.app`. Use right-click > Open the fi
 ![Screenshot 2023-11-06 at 2 07 45 pm](https://github.com/jeff-1amstudios/skifree_sdl/assets/1063652/4edce399-ddeb-499a-a554-aebb7a70dfad)
 
 ## Todo
-- Mouse support
 - Sound maybe(?) - https://foone.wordpress.com/2017/06/20/uncovering-the-sounds-of-skifree/
