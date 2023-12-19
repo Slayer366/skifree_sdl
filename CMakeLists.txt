@@ -85,4 +85,4 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 endif()
 
-target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+target_link_libraries(${PROJECT_NAME} SDL2 ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
