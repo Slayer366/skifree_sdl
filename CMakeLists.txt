@@ -14,11 +14,19 @@ file(GLOB resource_files "resources/*.bmp")
 
 if (APPLE)
 
-    # generate icns file
+    # generate png file from ico
     add_custom_command(
-        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ski32.icns"
-        COMMAND "${CMAKE_SOURCE_DIR}/tools/make-osx-icns.sh"
-        DEPENDS "resources/ICONSKI.png"
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ICONSKI.png
+        COMMAND convert
+        ARGS -flatten ${CMAKE_SOURCE_DIR}/resources/ICONSKI.ICO ${CMAKE_CURRENT_BINARY_DIR}/ICONSKI.PNG
+        DEPENDS ${CMAKE_SOURCE_DIR}/resources/ICONSKI.ICO
+    )
+
+    # generate icns file from png
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ski32.icns
+        COMMAND ${CMAKE_SOURCE_DIR}/tools/make-osx-icns.sh
+        DEPENDS ICONSKI.png
     )
 
     set(skifree_sdl_ICON ${CMAKE_CURRENT_BINARY_DIR}/ski32.icns)
@@ -40,6 +48,11 @@ if (APPLE)
         ski32.icns
     )
 
+    INSTALL(CODE "
+        include(BundleUtilities)
+        fixup_bundle(${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app \"\" \"/Library/Frameworks\")
+        ")
+
 else()
     add_executable(${PROJECT_NAME})
 endif()
@@ -58,11 +71,10 @@ target_sources(${PROJECT_NAME} PRIVATE
 # Add all headers files under the include directory
 target_include_directories(${PROJECT_NAME} PRIVATE 
     include
-    "${CMAKE_CURRENT_BINARY_DIR}"
-    ${SDL2_IMAGE_INCLUDE_DIR}
-    ${SDL2_TTF_INCLUDE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${SDL2IMAGE_INCLUDE_DIR}
+    ${SDL2TTF_INCLUDE_DIR}
 )
-
 
 # Add compiler errors/warnings flags
 if(MSVC)
@@ -73,4 +85,4 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 endif()
 
-target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ${SDL2_IMAGE_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
