@@ -438,6 +438,9 @@ SDL_Texture* smallTextureAtlas;
 
 SDL_Texture* statusWindowTexture;
 SDL_Surface* statusWindowSurface;
+
+SDL_Texture *CursorTexture;
+
 SDL_TimerID timer_id;
 
 // HINSTANCE skiFreeHInstance = NULL;

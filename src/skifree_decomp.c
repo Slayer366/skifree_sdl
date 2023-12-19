@@ -16,6 +16,9 @@
 
 static int fullscreen;
 
+int mouseX = 0;
+int mouseY = 0;
+
 // int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 int main(int argc, char* argv[]) {
     int iVar1;
@@ -84,7 +87,9 @@ int main(int argc, char* argv[]) {
                 break;
             case SDL_MOUSEMOTION:
                 if (inputEnabled != 0) {
-                    handleMouseMoveMessage(event.motion.x, event.motion.y);
+                    mouseX = event.motion.x;
+                    mouseY = event.motion.y;
+                    handleMouseMoveMessage(mouseX, mouseY);
                 }
             case SDL_KEYDOWN:
                 handleKeydownMessage(&event);
@@ -535,6 +540,12 @@ int initWindows() {
     calculateStatusWindowDimensions(hSkiStatusWnd);
     statusWindowTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, statusWindowTotalTextWidth, statusWindowHeight);
 
+    SDL_Surface *cursorSurface = IMG_Load("resources/cursor.png");
+    CursorTexture = SDL_CreateTextureFromSurface(renderer, cursorSurface);
+    SDL_FreeSurface(cursorSurface);
+
+    SDL_ShowCursor(SDL_DISABLE);
+
     if (loadBitmaps(hSkiMainWnd) == 0) {
         return 0;
     }
@@ -871,6 +882,10 @@ void mainWindowPaint(HWND param_1) {
     dstrect.w = statusWindowTotalTextWidth;
     dstrect.h = statusWindowHeight;
     SDL_RenderCopy(renderer, statusWindowTexture, NULL, &dstrect);
+
+    SDL_Rect cursorRect = {mouseX, mouseY, 20, 22};
+
+    SDL_RenderCopy(renderer, CursorTexture, NULL, &cursorRect);
 
     SDL_RenderPresent(renderer);
 }
