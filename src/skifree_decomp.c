@@ -10,6 +10,7 @@
 #include "resource.h"
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
+#include <getopt.h>
 
 #define ski_assert(exp, line) (void)((exp) || (assertFailed(sourceFilename, line), 0)) // TODO remove need for src param.
 
@@ -81,9 +82,20 @@ int main(int argc, char* argv[]) {
             case SDL_WINDOWEVENT:
                 HandleWindowMessage(&event);
                 break;
+            case SDL_MOUSEMOTION:
+                if (inputEnabled != 0) {
+                    handleMouseMoveMessage(event.motion.x, event.motion.y);
+                }
             case SDL_KEYDOWN:
                 handleKeydownMessage(&event);
+                if (event.key.keysym.sym == SDLK_F10) {
+                    is_running = 0;
+                }
                 break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (inputEnabled != 0) {
+                    handleMouseClick();
+                }
 
                 // case SDL_USEREVENT:
                 //     switch (event.user.code) {
@@ -493,7 +505,7 @@ int initWindows() {
     if (fullscreen)
         flags = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP;
     else
-        flags = SDL_WINDOW_SHOWN;
+        flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
 
     hSkiMainWnd = SDL_CreateWindow(lpWindowName,
@@ -1229,7 +1241,7 @@ HBITMAP loadBitmapResource(uint32_t resourceId) {
     // return LoadBitmapA(skiFreeHInstance, MAKEINTRESOURCE(resourceId));
 
     sprintf(filename, "resources/ski32_%d.bmp", resourceId);
-     SDL_Surface* bitmap = IMG_Load(filename);
+    SDL_Surface* bitmap = IMG_Load(filename);
 
 //    embedded_resource_t* res = get_embedded_resource_by_name(filename);
 //    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
@@ -3456,6 +3468,8 @@ void handleKeydownMessage(SDL_Event* e) {
 
         case 0x23:
         case 0x61:
+        case SDLK_END:
+        case SDLK_KP_1:
             /* numpad 1
                down left */
             if (sVar1 == 0) {
@@ -3465,6 +3479,8 @@ void handleKeydownMessage(SDL_Event* e) {
 
         case 0x22:
         case 99:
+        case SDLK_PAGEDOWN:
+        case SDLK_KP_3:
             /* numpad 3
                down right */
             if (sVar1 == 0) {
@@ -3474,6 +3490,8 @@ void handleKeydownMessage(SDL_Event* e) {
 
         case 0x2d:
         case 0x60:
+        case SDLK_INSERT:
+        case SDLK_KP_0:
             /* numpad 0, Insert
                Jump. */
             if (sVar1 == 0) {
