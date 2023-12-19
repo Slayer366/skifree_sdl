@@ -4,14 +4,16 @@
 #define NOMINMAX
 
 #include "skifree_decomp.h"
+#include "consts.h"
 #include "data.h"
 #include "embedded_resources.h"
 #include "resource.h"
-#include "sdl_helpers.h"
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 
 #define ski_assert(exp, line) (void)((exp) || (assertFailed(sourceFilename, line), 0)) // TODO remove need for src param.
+
+static int fullscreen;
 
 // int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 int main(int argc, char* argv[]) {
@@ -19,6 +21,13 @@ int main(int argc, char* argv[]) {
     BOOL retVal;
     // MSG msg;
     SDL_Event event;
+
+    int option;
+    while ((option = getopt(argc,argv, "f")) != -1) {
+        switch (option) {
+            case 'f':   fullscreen = !fullscreen;   break;
+        }
+    }
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
         printf("failed to init\n");
@@ -48,7 +57,7 @@ int main(int argc, char* argv[]) {
     iVar1 = setupGame();
     if (iVar1 == 0) {
         SDL_DestroyWindow(hSkiMainWnd);
-        cleanupSound();
+        //cleanupSound();
         return 0;
     }
     // iVar1 = GetMessageA(&msg, NULL, 0, 0);
@@ -95,7 +104,7 @@ int main(int argc, char* argv[]) {
 
         mainWindowPaint(hSkiMainWnd);
     }
-    cleanupSound();
+    //cleanupSound();
     return 0;
 }
 
@@ -237,6 +246,10 @@ void HandleWindowMessage(SDL_Event* e) {
     case SDL_WINDOWEVENT_RESTORED:
         isMinimised = 0;
         break;
+
+    case SDL_WINDOWEVENT_SIZE_CHANGED:
+        updateWindowSize(hSkiMainWnd);
+        break;
     }
 }
 
@@ -333,7 +346,7 @@ Actor* updateActorType2_dog(Actor* actor) {
         new_actor = addActorOfTypeWithSpriteIdx(ACTOR_TYPE_17_SIGN, 0x52);
         updateActorPositionMaybe(new_actor, (short)(sVar1 - 4), newY, inAir);
         actorFrameNo = 0x1b;
-        playSound(&sound_8);
+//        playSound(&sound_8);
     }
     new_actor = updateActorPositionWithVelocityMaybe(actor);
     return setActorFrameNo(new_actor, actorFrameNo);
@@ -413,12 +426,14 @@ int initWindows() {
     // short windowWidth;
     //  uint32_t uVar2;
     //  BOOL BVar3;
-    int nHeight;
+//    int nHeight;
     char* lpWindowName;
-    int nWidth;
+//    int nWidth;
 
-    SCREEN_WIDTH = 1280;
-    SCREEN_HEIGHT = 1024;
+    int flags;
+
+    SCREEN_WIDTH = 640;
+    SCREEN_HEIGHT = 480;
 
     isPaused = 0;
     // isMinimised = 1;
@@ -440,34 +455,52 @@ int initWindows() {
     //     return 0;
     // }
     // timerCallbackFuncPtr = timerCallbackFunc;
-    if ((isSoundDisabled == 0) && (loadSoundFunc() != 0)) {
-        loadSound(1, &sound_1);
-        loadSound(2, &sound_2);
-        loadSound(3, &sound_3);
-        loadSound(4, &sound_4);
-        loadSound(5, &sound_5);
-        loadSound(6, &sound_6);
-        loadSound(9, &sound_9);
-        loadSound(7, &sound_7);
-        loadSound(8, &sound_8);
-    }
-    windowWidth = SCREEN_WIDTH;
-    if (SCREEN_HEIGHT <= SCREEN_WIDTH) {
-        windowWidth = SCREEN_HEIGHT;
-    }
-    nWidth = windowWidth;
-    nHeight = SCREEN_HEIGHT;
+
+//    if ((isSoundDisabled == 0) && (loadSoundFunc() != 0)) {
+//        loadSound(1, &sound_1);
+//        loadSound(2, &sound_2);
+//        loadSound(3, &sound_3);
+//        loadSound(4, &sound_4);
+//        loadSound(5, &sound_5);
+//        loadSound(6, &sound_6);
+//        loadSound(9, &sound_9);
+//        loadSound(7, &sound_7);
+//        loadSound(8, &sound_8);
+//    }
+
+//    windowWidth = SCREEN_WIDTH;
+//    if (SCREEN_HEIGHT <= SCREEN_WIDTH) {
+//        windowWidth = SCREEN_HEIGHT;
+//    }
+
+//    nWidth = windowWidth;
+//    nHeight = SCREEN_HEIGHT;
+
     lpWindowName = getCachedString(IDS_TITLE);
 
-    // todo figure out client size we want
-    nWidth = 1008;
-    nHeight = 985;
+    // original code was asking for overall window size, here we have to convert it
+    // to client size to get the correct original ratio
+//    nWidth = 1008;
+//    nHeight = nWidth * 0.97718253968254f;
+
+//    hSkiMainWnd = SDL_CreateWindow(lpWindowName,
+//        SDL_WINDOWPOS_CENTERED,
+//        SDL_WINDOWPOS_CENTERED,
+//        nWidth, nHeight,
+//        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+
+
+    if (fullscreen)
+        flags = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP;
+    else
+        flags = SDL_WINDOW_SHOWN;
+
 
     hSkiMainWnd = SDL_CreateWindow(lpWindowName,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        nWidth, nHeight,
-        SDL_WINDOW_SHOWN);
+        SCREEN_WIDTH, SCREEN_HEIGHT,
+        flags);
 
     renderer = SDL_CreateRenderer(hSkiMainWnd, -1, SDL_RENDERER_ACCELERATED);
 
@@ -491,12 +524,12 @@ int initWindows() {
     return 1;
 }
 
-BOOL loadSoundFunc() {
-    sndPlaySoundAFuncPtr = NULL; // sndPlaySoundA;
-    return (sndPlaySoundAFuncPtr != NULL);
-}
+//BOOL loadSoundFunc() {
+//    sndPlaySoundAFuncPtr = NULL; // sndPlaySoundA;
+//    return (sndPlaySoundAFuncPtr != NULL);
+//}
 
-BOOL loadSound(uint32_t resourceId, Sound* sound) {
+//BOOL loadSound(uint32_t resourceId, Sound* sound) {
     // HRSRC hResInfo;
     // HGLOBAL pvVar1;
     // LPVOID pvVar2;
@@ -514,9 +547,9 @@ BOOL loadSound(uint32_t resourceId, Sound* sound) {
     //     sound->soundData = pvVar2;
     //     return TRUE;
     // }
-    sound->soundData = NULL;
-    return FALSE;
-}
+//    sound->soundData = NULL;
+//    return FALSE;
+//}
 
 uint16_t getSpriteIdxForActorType(int actorType) {
     int rand_result;
@@ -551,7 +584,7 @@ uint16_t getSpriteIdxForActorType(int actorType) {
     }
 }
 
-void playSound(Sound* sound) {
+//void playSound(Sound* sound) {
     // if (isSoundDisabled == 0)
     // {
     //     if ((sound->soundData == NULL) && (sound->soundResource != NULL))
@@ -563,7 +596,8 @@ void playSound(Sound* sound) {
     //         (*sndPlaySoundAFuncPtr)(sound->soundData, SND_ASYNC | SND_MEMORY);
     //     }
     // }
-}
+//}
+
 // TODO problems in byte matching due to deadcode removal.
 Actor* updateActorPositionWithVelocityMaybe(Actor* actor) {
     short newX;
@@ -601,35 +635,35 @@ void startGameTimer() {
     }
 }
 
-void cleanupSound() {
-    if (isSoundDisabled == 0) {
-        if (sndPlaySoundAFuncPtr != NULL) {
-            (*sndPlaySoundAFuncPtr)(0, 0);
-        }
-        if (DAT_0040c78c != NULL) {
-            // FreeLibrary(DAT_0040c78c);
-        }
-        freeSoundResource(&sound_1);
-        freeSoundResource(&sound_2);
-        freeSoundResource(&sound_3);
-        freeSoundResource(&sound_4);
-        freeSoundResource(&sound_5);
-        freeSoundResource(&sound_6);
-        freeSoundResource(&sound_9);
-        freeSoundResource(&sound_7);
-        freeSoundResource(&sound_8);
-    }
-}
+//void cleanupSound() {
+//    if (isSoundDisabled == 0) {
+//        if (sndPlaySoundAFuncPtr != NULL) {
+//            (*sndPlaySoundAFuncPtr)(0, 0);
+//        }
+//        if (DAT_0040c78c != NULL) {
+//            // FreeLibrary(DAT_0040c78c);
+//        }
+//        freeSoundResource(&sound_1);
+//        freeSoundResource(&sound_2);
+//        freeSoundResource(&sound_3);
+//        freeSoundResource(&sound_4);
+//        freeSoundResource(&sound_5);
+//        freeSoundResource(&sound_6);
+//        freeSoundResource(&sound_9);
+//        freeSoundResource(&sound_7);
+//        freeSoundResource(&sound_8);
+//    }
+//}
 
-void freeSoundResource(Sound* sound) {
-    if (sound->soundData != NULL) {
-        sound->soundData = NULL;
-    }
-    if (sound->soundResource != NULL) {
-        // FreeResource(sound->soundResource);
-        sound->soundResource = NULL;
-    }
-}
+// void freeSoundResource(Sound* sound) {
+//    if (sound->soundData != NULL) {
+//        sound->soundData = NULL;
+//    }
+//    if (sound->soundResource != NULL) {
+//        // FreeResource(sound->soundResource);
+//        sound->soundResource = NULL;
+//    }
+// }
 
 void togglePausedState() {
     char* str;
@@ -871,7 +905,12 @@ void paintStatusWindow(HWND hWnd) {
     // FrameRect(paint.hdc, &statusBorderRect, hbr);
 
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
-    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
+
+    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
+
+//    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 0, 0, 0));
+//    SDL_Rect r = { 1, 1, statusWindowSurface->w - 2, statusWindowSurface->h - 2 };
+//    SDL_FillRect(statusWindowSurface, &r, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
 
     str = getCachedString(IDS_TIME);
     len = strlen(str);
@@ -922,6 +961,7 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     }
 
     // GetTextMetricsA(statusWindowDC, &textMetric);
+//    TTF_SizeUTF8(statusWindowFont, "Ay", &w, &h);
     TTF_SizeUTF8(statusWindowFont, "A", &w, &h);
     textLineHeight = h;
     str = getCachedString(IDS_TIME);
@@ -948,10 +988,15 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     str = getCachedString(IDS_STYLE_BLANK);
     len = strlen(str);
     statusWindowFindLongestTextString(statusWindowDC, &maxValueLength, str, len);
-    statusWindowHeight = textLineHeight * 4; // TODO is this correct?
+    statusWindowHeight = textLineHeight * 4;
     //    _textLineHeight = _textLineHeight & 0xffff | (uint)(ushort)((short)_textLineHeight * 4) << 0x10;
     statusWindowTotalTextWidth = maxValueLength + maxKeyLength;
     statusWindowLabelWidth = maxKeyLength;
+
+    // added in sdl port
+//    statusWindowTotalTextWidth += 5;
+//    statusWindowHeight += 5;
+
     return 1;
 }
 
@@ -1172,7 +1217,7 @@ BOOL loadBitmaps(HWND hWnd) {
     largeBitmapSheet_1bpp = NULL;
     scratchBitmap = NULL;
     if (!createBitmapSheets(mainWindowDC)) {
-        showErrorMessage("Whoa, like, can't load bitmaps!  Yer outa memory, duuude!");
+        showErrorMessage("Whoa, like, can't load bitmaps!  Yer outta memory, duuude!");
         return FALSE;
     }
     return TRUE;
@@ -1184,11 +1229,11 @@ HBITMAP loadBitmapResource(uint32_t resourceId) {
     // return LoadBitmapA(skiFreeHInstance, MAKEINTRESOURCE(resourceId));
 
     sprintf(filename, "resources/ski32_%d.bmp", resourceId);
-    // SDL_Surface* bitmap = IMG_Load(filename);
+     SDL_Surface* bitmap = IMG_Load(filename);
 
-    embedded_resource_t* res = get_embedded_resource_by_name(filename);
-    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
-    SDL_Surface* bitmap = IMG_Load_RW(src, 1);
+//    embedded_resource_t* res = get_embedded_resource_by_name(filename);
+//    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
+//    SDL_Surface* bitmap = IMG_Load_RW(src, 1);
     return bitmap;
 }
 
@@ -1604,7 +1649,7 @@ Actor* updatePlayerActor(Actor* actor) {
     short sVar1;
     short uVar5;
     Actor* pAVar2;
-    Sound* sound;
+    //Sound* sound;
     int points;
     uint32_t ActorframeNo;
     short xPos;
@@ -1665,11 +1710,11 @@ Actor* updatePlayerActor(Actor* actor) {
                 ActorframeNo = uint32_t_ARRAY_0040a434[ActorframeNo];
                 if (ActorframeNo == 0x11) {
                     addStylePoints(-0x40);
-                    sound = &sound_1;
+                    //sound = &sound_1;
                 } else {
-                    sound = &sound_4;
+                    //sound = &sound_4;
                 }
-                playSound(sound);
+                //playSound(sound);
             }
         }
     }
@@ -2205,7 +2250,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
     int iVar4;
     BOOL bVar5;
     Actor* pAVar6;
-    Sound* sound;
+    //Sound* sound;
     short sVar9;
     short actor1y;
     short actor2y;
@@ -2243,7 +2288,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
     case ACTOR_TYPE_8_YETI_RIGHT:
         if (actor2 == playerActor) {
             ski_assert(iVar4 == 0, 2393);
-            playSound(&sound_7);
+            //playSound(&sound_7);
             if ((actor2->flags & FLAG_1) != 0) {
                 actor2 = duplicateAndLinkActor(actor2);
             }
@@ -2268,7 +2313,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 actor1->inAirCounter = 4;
                 //                        LAB_00403cb4:
                 addStylePoints(1);
-                playSound(&sound_2);
+                //playSound(&sound_2);
                 return setActorFrameNo(actor1, 0xd);
             }
             if (sVar9 <= sVar1)
@@ -2276,9 +2321,9 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
             //                LAB_00403bcc:
             actor1->inAirCounter = actor1->verticalVelocityMaybe / 2;
             addStylePoints(1);
-            sound = &sound_2;
+            //sound = &sound_2;
             //                LAB_00403be8:
-            playSound(sound);
+            //playSound(sound);
             return setActorFrameNo(actor1, local_c);
         case ACTOR_TYPE_2_DOG:
         case ACTOR_TYPE_12_SLALOM_FLAG:
@@ -2323,9 +2368,9 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 // goto LAB_00403bcc;
                 actor1->inAirCounter = actor1->verticalVelocityMaybe / 2;
                 addStylePoints(1);
-                sound = &sound_2;
+                //sound = &sound_2;
                 //                LAB_00403be8:
-                playSound(sound);
+                //playSound(sound);
                 return setActorFrameNo(actor1, local_c);
             }
         case ACTOR_TYPE_1_BEGINNER:
@@ -2369,7 +2414,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                     return setActorFrameNo(actor1, local_c);
                 }
                 addStylePoints(-0x20);
-                playSound(&sound_1);
+                //playSound(&sound_1);
                 return setActorFrameNo(actor1, local_c);
             }
             break;
@@ -2379,7 +2424,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 actor1->inAirCounter = actor1->verticalVelocityMaybe;
                 //                        goto LAB_00403cb4;
                 addStylePoints(1);
-                playSound(&sound_2);
+                //playSound(&sound_2);
                 return setActorFrameNo(actor1, 0xd);
             }
         }
@@ -2390,10 +2435,10 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
         if (iVar4 == 0) {
             addStylePoints(0x14);
         }
-        sound = &sound_6;
+        //sound = &sound_6;
         local_c = (0 < actor2->isInAir) + 0x19;
         //            goto LAB_00403be8;
-        playSound(sound);
+        //playSound(sound);
         return setActorFrameNo(actor1, local_c);
     case ACTOR_TYPE_2_DOG:
         if (((int)local_c < 0x1d) && ((actor2->HorizontalVelMaybe != 0 || (actor2->verticalVelocityMaybe != 0)))) {
@@ -2401,9 +2446,9 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 addStylePoints(3);
             }
             local_c = 0x1d;
-            sound = &sound_3;
+            //sound = &sound_3;
             //                goto LAB_00403be8;
-            playSound(sound);
+            //playSound(sound);
             return setActorFrameNo(actor1, local_c);
         }
         break;
@@ -2423,7 +2468,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
         case ACTOR_TYPE_16_JUMP:
             if (sVar1 < sVar9) {
                 actor1->inAirCounter = actor1->verticalVelocityMaybe / 2;
-                playSound(&sound_5);
+                //playSound(&sound_5);
                 return setActorFrameNo(actor1, 0x21);
             }
         }
@@ -2674,7 +2719,7 @@ void updateYeti(PermObject* permObject) {
                         }
                     }
                     sVar9 = (short)dY;
-                    playSound(&sound_9);
+                    //playSound(&sound_9);
                 }
             }
         }
@@ -3015,10 +3060,13 @@ void formatAndPrintStatusStrings(HDC windowDC) {
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
     SDL_Rect rect;
     rect.x = x;
+//    rect.y = 1;
+//    rect.w = statusWindowSurface->w - x - 1;
+//    rect.h = statusWindowSurface->h - 2;
     rect.y = 0;
     rect.w = statusWindowSurface->w - x;
     rect.h = statusWindowSurface->h;
-    SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
+    SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
 
     len = formatElapsedTime(elapsedTime, strBuf);
     drawText(windowDC, strBuf, x, &y, len);
@@ -3261,45 +3309,44 @@ void setupPermObjects() {
 // TODO not byte accurate
 void handleKeydownMessage(SDL_Event* e) {
     short sVar1;
-    uint32_t ActorframeNo;
+    uint32_t actorframeNo;
 
-    // switch (charCode)
-    // {
-    // case VK_ESCAPE:
-    //     ShowWindow(hSkiMainWnd, 6);
-    //     return;
-    // case VK_F3:
-    //     togglePausedState(); // TODO this is a jmp rather than a call in the original
-    //     return;
-    // case VK_RETURN:
-    //     if (playerActor != (Actor *)0x0)
-    //     {
-    //         return;
-    //     }
-    //     handleGameReset(); // TODO this is a jmp rather than a call in the original
-    //     return;
-    // case VK_F2:
-    //     handleGameReset(); // TODO this is a jmp rather than a call in the original
-    //     return;
-    // default:
-    //     break;
-    // }
+    switch (e->key.keysym.sym) {
+    case SDLK_ESCAPE:
+        // ShowWindow(hSkiMainWnd, 6 /*SW_MINIMIZE*/);
+        SDL_MinimizeWindow(hSkiMainWnd);
+        return;
+    case SDLK_F3:
+        togglePausedState(); // TODO this is a jmp rather than a call in the original
+        return;
+    case SDLK_RETURN:
+        if (playerActor != (Actor*)0x0) {
+            return;
+        }
+        handleGameReset(); // TODO this is a jmp rather than a call in the original
+        return;
+    case SDLK_F2:
+        handleGameReset(); // TODO this is a jmp rather than a call in the original
+        return;
+    default:
+        break;
+    }
 
     if (playerActor == NULL) {
         return;
     }
-    ActorframeNo = playerActor->frameNo;
+    actorframeNo = playerActor->frameNo;
     sVar1 = playerActor->isInAir;
-    if ((ActorframeNo != 0xb) && (ActorframeNo != 0x11)) {
+    if ((actorframeNo != 0xb) && (actorframeNo != 0x11)) {
         switch (e->key.keysym.sym) {
-        case 0x25:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             /* numpad 4
                left */
-            ski_assert(ActorframeNo < 0x16, 0xf63);
+            ski_assert(actorframeNo < 0x16, 0xf63);
 
-            ActorframeNo = playerTurnFrameNoTbl[ActorframeNo].leftFrameNo;
-            if (ActorframeNo == 7) {
+            actorframeNo = playerTurnFrameNoTbl[actorframeNo].leftFrameNo;
+            if (actorframeNo == 7) {
                 //                    iVar2 = (int)playerActor->HorizontalVelMaybe - 8;
                 //                    if (iVar2 <= -8) {
                 //                        iVar2 = -8;
@@ -3308,13 +3355,13 @@ void handleKeydownMessage(SDL_Event* e) {
                 playerActor->HorizontalVelMaybe = max_(playerActor->HorizontalVelMaybe - 8, -8);
             }
             break;
-        case 0x27:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             /* numpad 6, Right */
-            ski_assert(ActorframeNo < 0x16, 3947);
+            ski_assert(actorframeNo < 0x16, 3947);
 
-            ActorframeNo = playerTurnFrameNoTbl[ActorframeNo].rightFrameNo;
-            if (ActorframeNo == 8) {
+            actorframeNo = playerTurnFrameNoTbl[actorframeNo].rightFrameNo;
+            if (actorframeNo == 8) {
                 //                    iVar2 = (int) playerActor->HorizontalVelMaybe + 8;
                 //                    if (iVar2 >= 8) {
                 //                        iVar2 = 8;
@@ -3325,87 +3372,85 @@ void handleKeydownMessage(SDL_Event* e) {
             }
             break;
 
-        case 0x28:
+        case SDLK_KP_2:
         case SDLK_DOWN:
-            /* down key pressed */
             if (sVar1 == 0) {
-                ActorframeNo = 0;
+                actorframeNo = 0;
                 break;
             }
-            switch (ActorframeNo) {
+            switch (actorframeNo) {
             case 0xd:
-                ActorframeNo = 0x13;
+                actorframeNo = 0x13;
                 break;
             case 0x14:
-                ActorframeNo = 0xe;
+                actorframeNo = 0xe;
                 break;
             case 0x15:
-                ActorframeNo = 0xf;
+                actorframeNo = 0xf;
                 break;
             case 0x12:
-                ActorframeNo = 0xd;
+                actorframeNo = 0xd;
                 break;
             case 0x13:
-                ActorframeNo = 0x12;
+                actorframeNo = 0x12;
                 break;
             }
             break;
 
-        case 0x26:
+        case SDLK_KP_8:
         case SDLK_UP:
-            /* numpad 8 Up */
-            switch (ActorframeNo) {
+            switch (actorframeNo) {
             case 0xd:
                 //                switchD_0040628c_caseD_13:
-                ActorframeNo = 0x12;
+                actorframeNo = 0x12;
                 break;
             case 0x13:
                 //                switchD_0040628c_caseD_12:
-                ActorframeNo = 0xd;
+                actorframeNo = 0xd;
                 break;
             case 0xe:
-                ActorframeNo = 0x14;
+                actorframeNo = 0x14;
                 break;
             case 0xf:
-                ActorframeNo = 0x15;
+                actorframeNo = 0x15;
                 break;
             case 3:
             case 7:
             case 0xc:
                 if (playerActor->verticalVelocityMaybe == 0) {
-                    ActorframeNo = 9;
+                    actorframeNo = 9;
                     playerActor->verticalVelocityMaybe = -4;
                 }
                 break;
             case 6:
             case 8:
                 if (playerActor->verticalVelocityMaybe == 0) {
-                    ActorframeNo = 10;
+                    actorframeNo = 10;
                     playerActor->verticalVelocityMaybe = -4;
                 }
                 break;
             case 0x12:
                 //                switchD_0040628c_caseD_d:
-                ActorframeNo = 0x13;
+                actorframeNo = 0x13;
                 break;
             }
             break;
 
-        case 0x24:
-        case 0x67:
-            /* numpad 7
-               up left */
+        case SDLK_HOME:
+        case SDLK_KP_7:
             if (sVar1 == 0) {
-                ActorframeNo = 3;
+                actorframeNo = 3;
             }
             break;
 
         case 0x21:
         case 0x69:
+        case SDLK_PAGEUP:
+        case SDLK_KP_9:
             /* numpad 9
                Up right */
             if (sVar1 == 0) {
-                ActorframeNo = 6;
+                actorframeNo = 6;
             }
             break;
 
@@ -3414,7 +3459,7 @@ void handleKeydownMessage(SDL_Event* e) {
             /* numpad 1
                down left */
             if (sVar1 == 0) {
-                ActorframeNo = 1;
+                actorframeNo = 1;
             }
             break;
 
@@ -3423,7 +3468,7 @@ void handleKeydownMessage(SDL_Event* e) {
             /* numpad 3
                down right */
             if (sVar1 == 0) {
-                ActorframeNo = 4;
+                actorframeNo = 4;
             }
             break;
 
@@ -3433,7 +3478,7 @@ void handleKeydownMessage(SDL_Event* e) {
                Jump. */
             if (sVar1 == 0) {
                 playerActor->inAirCounter = 2;
-                ActorframeNo = 0xd;
+                actorframeNo = 0xd;
                 if (4 < playerActor->verticalVelocityMaybe) {
                     playerActor->verticalVelocityMaybe = playerActor->verticalVelocityMaybe + -4;
                 }
@@ -3441,7 +3486,7 @@ void handleKeydownMessage(SDL_Event* e) {
         }
     }
 
-    if ((ActorframeNo != playerActor->frameNo) && (setActorFrameNo(playerActor, ActorframeNo), redrawRequired != 0)) {
+    if ((actorframeNo != playerActor->frameNo) && (setActorFrameNo(playerActor, actorframeNo), redrawRequired != 0)) {
         drawWindow(mainWindowDC, &windowClientRect);
         redrawRequired = 0;
     }
@@ -3654,9 +3699,10 @@ BOOL createBitmapSheets(HDC param_1) {
     //     return FALSE;
     // }
     // bitmapSourceDC = CreateCompatibleDC(param_1);
-    for (resourceId = 1; (uint16_t)resourceId < 90; resourceId++) {
+    for (resourceId = 1; resourceId < NUM_SPRITES; resourceId++) {
+//    for (resourceId = 1; (uint16_t)resourceId < 90; resourceId++) {
         sprite = &sprites[resourceId];
-        sprite->id = resourceId;
+//        sprite->id = resourceId;
         bitmap = loadBitmapResource(resourceId);
         if (bitmap == (HBITMAP)0x0) {
             return FALSE;
@@ -3697,8 +3743,8 @@ BOOL createBitmapSheets(HDC param_1) {
         //  DeleteObject(pvVar2);
     }
 
-    SDL_SetColorKey(largeBitmapDC, SDL_TRUE, SDL_MapRGB(largeBitmapDC->format, 0xFF, 0xFF, 0xFF));
-    SDL_SetColorKey(smallBitmapDC, SDL_TRUE, SDL_MapRGB(smallBitmapDC->format, 0xFF, 0xFF, 0xFF));
+    SDL_SetColorKey(largeBitmapDC, SDL_TRUE, SDL_MapRGBA(largeBitmapDC->format, 0xFF, 0xFF, 0xFF, 0));
+    SDL_SetColorKey(smallBitmapDC, SDL_TRUE, SDL_MapRGBA(smallBitmapDC->format, 0xFF, 0xFF, 0xFF, 0));
 
     largeTextureAtlas = SDL_CreateTextureFromSurface(renderer, largeBitmapDC);
     smallTextureAtlas = SDL_CreateTextureFromSurface(renderer, smallBitmapDC);
@@ -3880,17 +3926,17 @@ void drawActor(HDC hdc, Actor* actor) {
 
                 // SRCAND
                 // BitBlt(hdc, rect->left, rect->top, (int)sprite->width, (int)sprite->height, sprite->sheetDC, 0, (int)sprite->sheetYOffset, 0x8800c6);
-                SDL_Rect src;
-                src.x = 0;
-                src.y = sprite->sheetYOffset;
-                src.w = sprite->width;
-                src.h = sprite->height;
+                //SDL_Rect src;
+                //src.x = 0;
+                //src.y = sprite->sheetYOffset;
+                //src.w = sprite->width;
+                //src.h = sprite->height;
 
-                SDL_Rect dest;
-                dest.x = rect->left;
-                dest.y = rect->top;
-                dest.w = sprite->width;
-                dest.h = sprite->height;
+                //SDL_Rect dest;
+                //dest.x = rect->left;
+                //dest.y = rect->top;
+                //dest.w = sprite->width;
+                //dest.h = sprite->height;
                 // SDL_RenderCopy(renderer, sprite->sheet, &src, &dest);
                 actor->flags |= FLAG_1;
             } else {
@@ -3952,18 +3998,18 @@ void drawActor(HDC hdc, Actor* actor) {
             ski_assert(rect->bottom - rect->top == spriteHeight, 1204);
             ski_assert(local_14 >= 0, 1205);
 
-            if (sVar10 < 0) {
-                printf("skipping because sVar10\n");
-                return;
-            }
+            // if (sVar10 < 0) {
+            //     printf("skipping because sVar10\n");
+            //     return;
+            // }
 
             ski_assert(sVar10 >= 0, 1206);
             ski_assert(newWidth >= spriteWidth, 1207);
 
-            if (sVar10 < 0) {
-                printf("skipping because sVar10\n");
-                return;
-            }
+            // if (sVar10 < 0) {
+            //     printf("skipping because sVar10\n");
+            //     return;
+            // }
             if (newHeight < spriteHeight) {
                 assertFailed(sourceFilename, 1208);
             }

@@ -62,7 +62,8 @@ char* STRINGTABLE[] = {
     "%2u:%2.2u:%2.2u.%2.2u",
     "%5.2dm",
     "%5.2dm/s",
-    "%7ld",
+//    "%7ld",
+    "%7d", /* originally "%7ld", */
     "High Scores",
     " <-- that's you",
     " <-- try again!"

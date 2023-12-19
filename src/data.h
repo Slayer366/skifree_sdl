@@ -8,7 +8,7 @@
 char s_assertErrorFormat[] = "%s line %u";
 char s_Assertion_Failed_0040c0a8[] = "Assertion Failed";
 char s_insufficient_local_memory[] = "Insufficient local memory.";
-char s_nosound_0040c0fc[] = "nosound";
+//char s_nosound_0040c0fc[] = "nosound";
 char iniSsConfigKey[] = "SS";
 char entpack_ini_section_name_ski[] = "Ski";
 char s_entpack_ini[] = "entpack.ini";
@@ -447,9 +447,9 @@ Actor* actorListPtr = NULL;
 Actor* playerActor = NULL;
 Actor* playerActorPtrMaybe_1 = NULL;
 PermObject* permObjects = NULL;
-BOOL isSoundDisabled = 0;
-uint16_t SCREEN_WIDTH = 0;
-uint16_t SCREEN_HEIGHT = 0;
+//BOOL isSoundDisabled = 0;
+uint16_t SCREEN_WIDTH = 640;
+uint16_t SCREEN_HEIGHT = 480;
 // HBRUSH whiteBrush;
 BOOL isPaused;
 BOOL isMinimised;
@@ -469,15 +469,15 @@ RECT statusBorderRect;
 RECT windowClientRectWith120Margin;
 HDC mainWindowDC;
 HDC statusWindowDC;
-Sound sound_1;
-Sound sound_2;
-Sound sound_3;
-Sound sound_4;
-Sound sound_5;
-Sound sound_6;
-Sound sound_7;
-Sound sound_8;
-Sound sound_9;
+//Sound sound_1;
+//Sound sound_2;
+//Sound sound_3;
+//Sound sound_4;
+//Sound sound_5;
+//Sound sound_6;
+//Sound sound_7;
+//Sound sound_8;
+//Sound sound_9;
 // LPCTSTR statusWindowNameStrPtr;
 // HGDIOBJ statusWindowFont;
 TTF_Font* statusWindowFont;
@@ -534,7 +534,7 @@ PermObjectList PermObjectList_0040c658;
 PermObjectList PermObjectList_0040c738; // ski lift poles
 PermObjectList PermObjectList_0040c720;
 
-int (*sndPlaySoundAFuncPtr)(LPCSTR, uint32_t);
+// int (*sndPlaySoundAFuncPtr)(LPCSTR, uint32_t);
 
 // uint32_t (*timerCallbackFuncPtr)(uint32_t);
 

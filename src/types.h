@@ -5,7 +5,7 @@
 #ifndef SKIFREE_DECOMP_TYPES_H
 #define SKIFREE_DECOMP_TYPES_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 typedef int BOOL;
 typedef void* HDC;
@@ -90,11 +90,11 @@ typedef struct
     uint32_t frameNo;
 } ActorVelStruct;
 
-typedef struct
-{
-    /*HGLOBAL*/ void* soundResource;
-    void* soundData;
-} Sound;
+//typedef struct
+//{
+//    /*HGLOBAL*/ void* soundResource;
+//    void* soundData;
+//} Sound;
 
 typedef struct
 {

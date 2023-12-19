@@ -1,6 +1,6 @@
 #include "types.h"
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 
 typedef SDL_Surface* HBITMAP;
@@ -9,8 +9,8 @@ int initWindows(void);
 void assertFailed(const char* srcFilename, int lineNumber);
 int showErrorMessage(LPCSTR text);
 BOOL allocateMemory(void);
-BOOL loadSoundFunc(void);
-BOOL loadSound(uint32_t resourceId, Sound* sound);
+// BOOL loadSoundFunc(void);
+// BOOL loadSound(uint32_t resourceId, Sound* sound);
 void statusWindowFindLongestTextString(HDC hdc, short* maxLength, LPCSTR textStr, int textLength);
 void paintStatusWindow(HWND hWnd);
 BOOL calculateStatusWindowDimensions(HWND hWnd);
@@ -20,9 +20,9 @@ void statusWindowReleaseDC(HWND hWnd);
 void paintActors(HDC hdc, RECT* paintRect);
 void pauseGame(void);
 void togglePausedState(void);
-void freeSoundResource(Sound* sound);
+// void freeSoundResource(Sound* sound);
 void cleanupSound(void);
-void playSound(Sound* sound);
+// void playSound(Sound* sound);
 Actor* addActor(Actor* actor, BOOL insertBack);
 HBITMAP loadBitmapResource(uint32_t resourceId);
 BOOL loadBitmaps(HWND hWnd);
