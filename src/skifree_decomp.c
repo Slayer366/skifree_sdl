@@ -502,7 +502,7 @@ int initWindows() {
         SCREEN_WIDTH, SCREEN_HEIGHT,
         flags);
 
-    renderer = SDL_CreateRenderer(hSkiMainWnd, -1, SDL_RENDERER_ACCELERATED);
+    renderer = SDL_CreateRenderer(hSkiMainWnd, -1, SDL_RENDERER_SOFTWARE);
 
     SDL_RendererInfo info;
     SDL_GetRendererInfo(renderer, &info);
