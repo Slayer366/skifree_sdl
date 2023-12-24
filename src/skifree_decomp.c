@@ -516,7 +516,10 @@ int initWindows() {
     calculateStatusWindowDimensions(hSkiStatusWnd);
     statusWindowTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, statusWindowTotalTextWidth, statusWindowHeight);
 
-    SDL_Surface *cursorSurface = IMG_Load("resources/cursor.png");
+    embedded_resource_t* res = get_embedded_resource_by_name("resources/cursor.png");
+    SDL_RWops* src = SDL_RWFromConstMem(res->content, res->len);
+    //SDL_Surface *cursorSurface = IMG_Load("resources/cursor.png");
+    SDL_Surface *cursorSurface = IMG_Load_RW(src, 1);
     CursorTexture = SDL_CreateTextureFromSurface(renderer, cursorSurface);
     SDL_FreeSurface(cursorSurface);
 

@@ -11,6 +11,7 @@ find_package(SDL2_ttf REQUIRED)
 
 file(GLOB SOURCES "src/*.c")
 file(GLOB resource_files "resources/*.bmp")
+file(GLOB resource_files "resources/*.png")
 
 if (APPLE)
 
