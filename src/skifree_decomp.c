@@ -101,16 +101,6 @@ int main(int argc, char* argv[]) {
                 if (inputEnabled != 0) {
                     handleMouseClick();
                 }
-
-                // case SDL_USEREVENT:
-                //     switch (event.user.code) {
-                //     case USER_EVENT_CODE_TIMER:
-                //         timerUpdateFunc();
-                //         break;
-                //     default:
-                //         abort();
-                //     }
-                //     break;
             }
         }
 
@@ -500,24 +490,10 @@ int initWindows() {
     nWidth = 1008;
     nHeight = nWidth * 0.97718253968254f;
 
-//    hSkiMainWnd = SDL_CreateWindow(lpWindowName,
-//        SDL_WINDOWPOS_CENTERED,
-//        SDL_WINDOWPOS_CENTERED,
-//        nWidth, nHeight,
-//        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-
-
     if (fullscreen)
         flags = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP;
     else
         flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-
-
-//    hSkiMainWnd = SDL_CreateWindow(lpWindowName,
-//        SDL_WINDOWPOS_CENTERED,
-//        SDL_WINDOWPOS_CENTERED,
-//        SCREEN_WIDTH, SCREEN_HEIGHT,
-//        flags);
 
     hSkiMainWnd = SDL_CreateWindow(lpWindowName,
         SDL_WINDOWPOS_CENTERED,
@@ -939,8 +915,6 @@ void paintStatusWindow(HWND hWnd) {
 
     SDL_LockTextureToSurface(statusWindowTexture, NULL, &statusWindowSurface);
 
-//    SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
-
     SDL_FillRect(statusWindowSurface, NULL, SDL_MapRGB(statusWindowSurface->format, 0, 0, 0));
     SDL_Rect r = { 1, 1, statusWindowSurface->w - 2, statusWindowSurface->h - 2 };
     SDL_FillRect(statusWindowSurface, &r, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
@@ -995,7 +969,6 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
 
     // GetTextMetricsA(statusWindowDC, &textMetric);
     TTF_SizeUTF8(statusWindowFont, "Ay", &w, &h);
-//    TTF_SizeUTF8(statusWindowFont, "A", &w, &h);
     textLineHeight = h;
     str = getCachedString(IDS_TIME);
     len = strlen(str);
@@ -1022,7 +995,6 @@ BOOL calculateStatusWindowDimensions(HWND hWnd) {
     len = strlen(str);
     statusWindowFindLongestTextString(statusWindowDC, &maxValueLength, str, len);
     statusWindowHeight = textLineHeight * 4;
-    //    _textLineHeight = _textLineHeight & 0xffff | (uint)(ushort)((short)_textLineHeight * 4) << 0x10;
     statusWindowTotalTextWidth = maxValueLength + maxKeyLength;
     statusWindowLabelWidth = maxKeyLength;
 
@@ -1250,7 +1222,7 @@ BOOL loadBitmaps(HWND hWnd) {
     largeBitmapSheet_1bpp = NULL;
     scratchBitmap = NULL;
     if (!createBitmapSheets(mainWindowDC)) {
-        showErrorMessage("Whoa, like, can't load bitmaps!  Yer outta memory, duuude!");
+        showErrorMessage("Whoa, like, can't load bitmaps!  Yer outa memory, duuude!");
         return FALSE;
     }
     return TRUE;
@@ -3096,12 +3068,6 @@ void formatAndPrintStatusStrings(HDC windowDC) {
     rect.y = 1;
     rect.w = statusWindowSurface->w - x - 1;
     rect.h = statusWindowSurface->h - 2;
-
-//    rect.y = 0;
-//    rect.w = statusWindowSurface->w - x;
-//    rect.h = statusWindowSurface->h;
-
-//    SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGBA(statusWindowSurface->format, 255, 255, 255, 0));
     SDL_FillRect(statusWindowSurface, &rect, SDL_MapRGB(statusWindowSurface->format, 255, 255, 255));
 
     len = formatElapsedTime(elapsedTime, strBuf);
@@ -3742,9 +3708,7 @@ BOOL createBitmapSheets(HDC param_1) {
     // }
     // bitmapSourceDC = CreateCompatibleDC(param_1);
     for (resourceId = 1; resourceId < NUM_SPRITES; resourceId++) {
-//    for (resourceId = 1; (uint16_t)resourceId < 90; resourceId++) {
         sprite = &sprites[resourceId];
-//        sprite->id = resourceId;
         bitmap = loadBitmapResource(resourceId);
         if (bitmap == (HBITMAP)0x0) {
             return FALSE;
@@ -3968,18 +3932,6 @@ void drawActor(HDC hdc, Actor* actor) {
 
                 // SRCAND
                 // BitBlt(hdc, rect->left, rect->top, (int)sprite->width, (int)sprite->height, sprite->sheetDC, 0, (int)sprite->sheetYOffset, 0x8800c6);
-                //SDL_Rect src;
-                //src.x = 0;
-                //src.y = sprite->sheetYOffset;
-                //src.w = sprite->width;
-                //src.h = sprite->height;
-
-                //SDL_Rect dest;
-                //dest.x = rect->left;
-                //dest.y = rect->top;
-                //dest.w = sprite->width;
-                //dest.h = sprite->height;
-                // SDL_RenderCopy(renderer, sprite->sheet, &src, &dest);
                 actor->flags |= FLAG_1;
             } else {
                 actor->flags &= 0xfffffffe;

@@ -26,7 +26,7 @@ typedef struct _RECT {
 
 typedef struct
 {
-    int id; // added by jeff
+    /* int id; // added by jeff */
     HDC sheetDC;
     HDC sheetDC_1bpp;
     SDL_Texture* sheet;
@@ -102,6 +102,7 @@ typedef struct
     int rightFrameNo;
 } PlayerTurnFrameNoLookupTbl;
 
+/*
 #define NUM_ACTORS 100
 #define NUM_SPRITES 90
 #define NUM_STRINGS 20
@@ -143,5 +144,6 @@ typedef struct
 #define ACTOR_TYPE_16_JUMP 16         // 10
 #define ACTOR_TYPE_17_SIGN 17         // 11
 #define ACTOR_TYPE_18_NOTHING 18      // 12
+*/
 
 #endif // SKIFREE_DECOMP_TYPES_H
