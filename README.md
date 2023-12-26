@@ -24,10 +24,12 @@ unzip -d resources /tmp/ski32_resources.zip
 ### Libraries
 - SDL2
 - SDL2_image
+- SDL2_mixer
 - SDL2_ttf
 
+## Ubuntu / Debian
 ```
-sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
 ```
 
 ## Compiling
@@ -64,5 +66,7 @@ On MacOS we build an app bundle `skifree_sdl.app`. Use right-click > Open the fi
 
 ![Screenshot 2023-11-06 at 2 07 45 pm](https://github.com/jeff-1amstudios/skifree_sdl/assets/1063652/4edce399-ddeb-499a-a554-aebb7a70dfad)
 
-## Todo
-- Sound maybe(?) - https://foone.wordpress.com/2017/06/20/uncovering-the-sounds-of-skifree/
+## Some bugs are still present, but the game works for the most part.
+- Code conversion to C is not byte accurate.
+- Issue with keeping track of time and sometimes even skips 20 whole seconds on the timer.
+- Game experiences random crashes on some systems.
