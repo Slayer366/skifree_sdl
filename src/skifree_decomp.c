@@ -494,6 +494,7 @@ int initWindows() {
           woof = Mix_LoadWAV("resources/woof.wav");
           ding = Mix_LoadWAV("resources/ding.wav");
           buzz = Mix_LoadWAV("resources/buzz.wav");
+          grind = Mix_LoadWAV("resources/grind.wav");
     }
 
 
@@ -694,6 +695,7 @@ void cleanupSound() {
         Mix_FreeChunk(woof);
         Mix_FreeChunk(ding);
         Mix_FreeChunk(buzz);
+        Mix_FreeChunk(grind);
     }
 }
 
@@ -2377,9 +2379,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
             //playSound(sound);
             return setActorFrameNo(actor1, local_c);
         case ACTOR_TYPE_2_DOG:
-            break;
         case ACTOR_TYPE_12_SLALOM_FLAG:
-            break;
         case ACTOR_TYPE_17_SIGN:
             if (bVar5) {
                 actor1->verticalVelocityMaybe = actor1->verticalVelocityMaybe / 2;
@@ -2424,12 +2424,11 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 //sound = &sound_2;
                 //                LAB_00403be8:
                 //playSound(sound);
+                Mix_PlayChannel(-1, grind, 0);
                 return setActorFrameNo(actor1, local_c);
             }
         case ACTOR_TYPE_1_BEGINNER:
-            break;
         case ACTOR_TYPE_3_SNOWBOARDER:
-            break;
         case 4:
         case 9:
         case 10:
@@ -2470,6 +2469,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 }
                 addStylePoints(-0x20);
                 //playSound(&sound_1);
+                Mix_PlayChannel(-1, ouch, 0);
                 return setActorFrameNo(actor1, local_c);
             }
             break;

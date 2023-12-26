@@ -495,6 +495,7 @@ Mix_Chunk *whoosh;
 Mix_Chunk *woof;
 Mix_Chunk *ding;
 Mix_Chunk *buzz;
+Mix_Chunk *grind;
 // LPCTSTR statusWindowNameStrPtr;
 // HGDIOBJ statusWindowFont;
 TTF_Font* statusWindowFont;
