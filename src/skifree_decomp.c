@@ -9,6 +9,7 @@
 #include "embedded_resources.h"
 #include "resource.h"
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <getopt.h>
 
@@ -33,9 +34,14 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0) {
         printf("failed to init\n");
         return 1;
+    }
+
+    if(Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) < 0) {
+        printf("Mix_OpenAudio: %s\n", Mix_GetError());
+        return FALSE;
     }
 
     TTF_Init();
@@ -61,7 +67,7 @@ int main(int argc, char* argv[]) {
     iVar1 = setupGame();
     if (iVar1 == 0) {
         SDL_DestroyWindow(hSkiMainWnd);
-        //cleanupSound();
+        cleanupSound();
         return 0;
     }
     // iVar1 = GetMessageA(&msg, NULL, 0, 0);
@@ -77,6 +83,7 @@ int main(int argc, char* argv[]) {
     int is_running = 1;
     int last_timer = SDL_GetTicks();
     while (is_running) {
+        SDL_Delay(1);
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_QUIT:
@@ -111,7 +118,7 @@ int main(int argc, char* argv[]) {
 
         mainWindowPaint(hSkiMainWnd);
     }
-    //cleanupSound();
+    cleanupSound();
     return 0;
 }
 
@@ -354,6 +361,7 @@ Actor* updateActorType2_dog(Actor* actor) {
         updateActorPositionMaybe(new_actor, (short)(sVar1 - 4), newY, inAir);
         actorFrameNo = 0x1b;
 //        playSound(&sound_8);
+        Mix_PlayChannel(-1, piddle, 0);
     }
     new_actor = updateActorPositionWithVelocityMaybe(actor);
     return setActorFrameNo(new_actor, actorFrameNo);
@@ -463,6 +471,7 @@ int initWindows() {
     // }
     // timerCallbackFuncPtr = timerCallbackFunc;
 
+    if ((isSoundDisabled == 0)) {
 //    if ((isSoundDisabled == 0) && (loadSoundFunc() != 0)) {
 //        loadSound(1, &sound_1);
 //        loadSound(2, &sound_2);
@@ -473,7 +482,20 @@ int initWindows() {
 //        loadSound(9, &sound_9);
 //        loadSound(7, &sound_7);
 //        loadSound(8, &sound_8);
-//    }
+          piddle = Mix_LoadWAV("resources/piddle.wav");
+          gobble = Mix_LoadWAV("resources/gobble.wav");
+          jump = Mix_LoadWAV("resources/jump.wav");
+          land = Mix_LoadWAV("resources/land.wav");
+          ooh = Mix_LoadWAV("resources/ooh.wav");
+          ouch = Mix_LoadWAV("resources/ouch.wav");
+          snowboard = Mix_LoadWAV("resources/snowboard.wav");
+          step = Mix_LoadWAV("resources/step.wav");
+          whoosh = Mix_LoadWAV("resources/whoosh.wav");
+          woof = Mix_LoadWAV("resources/woof.wav");
+          ding = Mix_LoadWAV("resources/ding.wav");
+          buzz = Mix_LoadWAV("resources/buzz.wav");
+    }
+
 
     windowWidth = SCREEN_WIDTH;
     if (SCREEN_HEIGHT <= SCREEN_WIDTH) {
@@ -643,25 +665,37 @@ void startGameTimer() {
     }
 }
 
-//void cleanupSound() {
-//    if (isSoundDisabled == 0) {
+void cleanupSound() {
+    if (isSoundDisabled == 0) {
 //        if (sndPlaySoundAFuncPtr != NULL) {
 //            (*sndPlaySoundAFuncPtr)(0, 0);
 //        }
 //        if (DAT_0040c78c != NULL) {
-//            // FreeLibrary(DAT_0040c78c);
+            // FreeLibrary(DAT_0040c78c);
 //        }
-//        freeSoundResource(&sound_1);
-//        freeSoundResource(&sound_2);
-//        freeSoundResource(&sound_3);
-//        freeSoundResource(&sound_4);
-//        freeSoundResource(&sound_5);
-//        freeSoundResource(&sound_6);
-//        freeSoundResource(&sound_9);
-//        freeSoundResource(&sound_7);
-//        freeSoundResource(&sound_8);
-//    }
-//}
+        //freeSoundResource(&sound_1);
+        //freeSoundResource(&sound_2);
+        //freeSoundResource(&sound_3);
+        //freeSoundResource(&sound_4);
+        //freeSoundResource(&sound_5);
+        //freeSoundResource(&sound_6);
+        //freeSoundResource(&sound_9);
+        //freeSoundResource(&sound_7);
+        //freeSoundResource(&sound_8);
+        Mix_FreeChunk(piddle);
+        Mix_FreeChunk(gobble);
+        Mix_FreeChunk(jump);
+        Mix_FreeChunk(land);
+        Mix_FreeChunk(ooh);
+        Mix_FreeChunk(ouch);
+        Mix_FreeChunk(snowboard);
+        Mix_FreeChunk(step);
+        Mix_FreeChunk(whoosh);
+        Mix_FreeChunk(woof);
+        Mix_FreeChunk(ding);
+        Mix_FreeChunk(buzz);
+    }
+}
 
 // void freeSoundResource(Sound* sound) {
 //    if (sound->soundData != NULL) {
@@ -1719,8 +1753,10 @@ Actor* updatePlayerActor(Actor* actor) {
                 if (ActorframeNo == 0x11) {
                     addStylePoints(-0x40);
                     //sound = &sound_1;
+                    //Mix_PlayChannel(-1, jump, 0);
                 } else {
                     //sound = &sound_4;
+                    Mix_PlayChannel(-1, land, 0);
                 }
                 //playSound(sound);
             }
@@ -1787,7 +1823,10 @@ void updateSsGameMode(Actor* actor, short xPos, short yPos) {
                 iVar1 = FUN_00402e30((int)x, (int)xPos, (int)y, (int)yPos, (int)currentSlalomFlag->maybeY);
                 if (((currentSlalomFlag->spriteIdx == 0x17) && ((short)iVar1 > currentSlalomFlag->maybeX)) || ((currentSlalomFlag->spriteIdx == 0x18 && ((short)iVar1 < currentSlalomFlag->maybeX)))) {
                     spriteIdx = 0x1a;
+                    Mix_PlayChannel(-1, buzz, 0);
                     timedGameRelated = timedGameRelated - 5000;
+                } else {
+                    Mix_PlayChannel(-1, ding, 0);
                 }
                 permObjectSetSpriteIdx(currentSlalomFlag, spriteIdx);
                 currentSlalomFlag = currentSlalomFlag + 1;
@@ -2078,7 +2117,10 @@ void updateGsGameMode(Actor* actor, short xPos, short yPos) {
                 iVar1 = FUN_00402e30((int)x, (int)xPos, (int)y, (int)yPos, (int)currentSlalomFlag->maybeY);
                 if (((currentSlalomFlag->spriteIdx == 0x17) && ((short)iVar1 > currentSlalomFlag->maybeX)) || ((currentSlalomFlag->spriteIdx == 0x18 && ((short)iVar1 < currentSlalomFlag->maybeX)))) {
                     spriteIdx = 0x1a;
+                    Mix_PlayChannel(-1, buzz, 0);
                     timedGameRelated = timedGameRelated - 5000;
+                } else {
+                    Mix_PlayChannel(-1, ding, 0);
                 }
                 permObjectSetSpriteIdx(currentSlalomFlag, spriteIdx);
                 currentSlalomFlag = currentSlalomFlag + 1;
@@ -2297,6 +2339,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
         if (actor2 == playerActor) {
             ski_assert(iVar4 == 0, 2393);
             //playSound(&sound_7);
+            Mix_PlayChannel(-1, gobble, 0);
             if ((actor2->flags & FLAG_1) != 0) {
                 actor2 = duplicateAndLinkActor(actor2);
             }
@@ -2334,7 +2377,9 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
             //playSound(sound);
             return setActorFrameNo(actor1, local_c);
         case ACTOR_TYPE_2_DOG:
+            break;
         case ACTOR_TYPE_12_SLALOM_FLAG:
+            break;
         case ACTOR_TYPE_17_SIGN:
             if (bVar5) {
                 actor1->verticalVelocityMaybe = actor1->verticalVelocityMaybe / 2;
@@ -2382,7 +2427,9 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 return setActorFrameNo(actor1, local_c);
             }
         case ACTOR_TYPE_1_BEGINNER:
+            break;
         case ACTOR_TYPE_3_SNOWBOARDER:
+            break;
         case 4:
         case 9:
         case 10:
@@ -2433,6 +2480,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
                 //                        goto LAB_00403cb4;
                 addStylePoints(1);
                 //playSound(&sound_2);
+                Mix_PlayChannel(-1, jump, 0);
                 return setActorFrameNo(actor1, 0xd);
             }
         }
@@ -2447,6 +2495,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
         local_c = (0 < actor2->isInAir) + 0x19;
         //            goto LAB_00403be8;
         //playSound(sound);
+        Mix_PlayChannel(-1, ooh, 0);
         return setActorFrameNo(actor1, local_c);
     case ACTOR_TYPE_2_DOG:
         if (((int)local_c < 0x1d) && ((actor2->HorizontalVelMaybe != 0 || (actor2->verticalVelocityMaybe != 0)))) {
@@ -2457,6 +2506,7 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
             //sound = &sound_3;
             //                goto LAB_00403be8;
             //playSound(sound);
+            Mix_PlayChannel(-1, woof, 0);
             return setActorFrameNo(actor1, local_c);
         }
         break;
@@ -2477,12 +2527,15 @@ Actor* handleActorCollision(Actor* actor1, Actor* actor2) {
             if (sVar1 < sVar9) {
                 actor1->inAirCounter = actor1->verticalVelocityMaybe / 2;
                 //playSound(&sound_5);
+                Mix_PlayChannel(-1, snowboard, 0);
                 return setActorFrameNo(actor1, 0x21);
             }
         }
         break;
     case ACTOR_TYPE_4_CHAIRLIFT:
+        break;
     case ACTOR_TYPE_9_TREE_ON_FIRE:
+        Mix_PlayChannel(-1, whoosh, 0);
         break;
     default:
         assertFailed(sourceFilename, 2376);
@@ -2728,6 +2781,7 @@ void updateYeti(PermObject* permObject) {
                     }
                     sVar9 = (short)dY;
                     //playSound(&sound_9);
+                    Mix_PlayChannel(-1, step, 0);
                 }
             }
         }
