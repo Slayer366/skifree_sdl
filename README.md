@@ -17,7 +17,7 @@ from the [official Skifree website](https://ski.ihoc.net/) and extract the resou
 
 Alternatively, you can fetch pre-extracted resources: 
 ```sh
-curl -Lo /tmp/ski32_resources.zip https://archive.org/download/ski32_resources/ski32_resources.zip
+curl -Lo /tmp/ski32_resources.zip -k https://archive.org/download/ski32_resources/ski32_resources.zip
 unzip -d resources /tmp/ski32_resources.zip
 ```
 
@@ -42,7 +42,7 @@ IMPORTANT: Make sure to have the SkiFree resources extracted and copied into the
 git clone https://github.com/Slayer366/skifree_sdl
 cd skifree_sdl
 # grab resources
-curl -Lo /tmp/ski32_resources.zip https://archive.org/download/ski32_resources/ski32_resources.zip
+curl -Lo /tmp/ski32_resources.zip -k https://archive.org/download/ski32_resources/ski32_resources.zip
 unzip -d resources /tmp/ski32_resources.zip
 
 mkdir build
